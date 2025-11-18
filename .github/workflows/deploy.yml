@@ -10,6 +10,8 @@ on:
 # 실행될 작업(job)들을 정의합니다.
 jobs:
   build-and-deploy:
+    permissions:
+       contents: write
     # 작업이 실행될 환경을 지정합니다. 최신 Ubuntu 환경을 사용합니다.
     runs-on: ubuntu-latest
 
