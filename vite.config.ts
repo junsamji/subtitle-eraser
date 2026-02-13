@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-	  base: '/subtitle-remove/',
+	  base: '/subtitle-eraser/',
       plugins: [
 		react(),
 		tailwindcss()
