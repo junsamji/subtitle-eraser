@@ -21,4 +21,4 @@ View your app in AI Studio: https://ai.studio/apps/drive/1kgHFzAQTrx58rhD4TswrVn
 
 Have A Good day
 
-action 배포연습
+action 배포연습2
