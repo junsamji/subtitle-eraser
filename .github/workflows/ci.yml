@@ -2,21 +2,19 @@ name: CI
 
 on:
     push:
-          branches: ["main"]
+          branches: [main]
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Build
-              run: npm install
-              run: npm run build
-              uses: actions/configure-pages@v5
-              uses: actions/upload-pages-artifact@v3
+            - uses: actions/checkout@v6
+            - run: npm install
+            - run: npm run build
+            - uses: actions/configure-pages@v5
+            - uses: actions/upload-pages-artifact@v3
               with:
-                path: './dist'
+                path: "./dist"
     deploy:
         needs: build
         permissions:
@@ -27,6 +25,5 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
         steps:
-            - name: Deploy
-              uses: actions/deploy-pages@v4
+            - uses: actions/deploy-pages@v4
               id: deployment
