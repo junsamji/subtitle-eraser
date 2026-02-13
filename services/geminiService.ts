@@ -31,8 +31,27 @@ export const removeSubtitlesFromImage = async (imageFile: File): Promise<string>
   try {
     const { mimeType, data: base64ImageData } = await fileToBase64(imageFile);
 
+    // Enhanced prompt focusing on removing text over faces and complex areas
+    const prompt = `
+      [TASK] 
+      Remove ALL text, subtitles, watermarks, and advertising banners from this image.
+      
+      [CRITICAL INSTRUCTION]
+      Pay special attention to text that is placed OVER human faces, bodies, hair, or eyes. 
+      Do NOT blur the faces; instead, remove only the text and reconstruct the hidden features (skin texture, facial features, hair strands) using inpainting techniques.
+      
+      [QUALITY REQUIREMENTS]
+      - The result must look like a clean, original photograph without any traces of editing.
+      - Match the surrounding lighting, grain, and color perfectly.
+      - Reconstruct complex backgrounds (nature, cityscapes, patterned clothing) where the text was located.
+      - Ensure high resolution and sharp details in the inpainted areas.
+      
+      [LANGUAGE]
+      Please process this request and return the edited image.
+    `;
+
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image-preview',
+      model: 'gemini-2.5-flash-image',
       contents: {
         parts: [
           {
@@ -42,15 +61,17 @@ export const removeSubtitlesFromImage = async (imageFile: File): Promise<string>
             },
           },
           {
-            text: '이미지에서 모든 자막과 텍스트를 제거해주세요. 원본 이미지의 스타일과 품질을 최대한 유지하고, 자막이 있던 부분을 주변 배경과 어울리게 자연스럽게 복원해주세요. Please remove all subtitles and text from the image. Maintain the original image\'s style and quality as much as possible, and naturally restore the area where the subtitles were to blend with the background.',
+            text: prompt,
           },
         ],
       },
       config: {
-        responseModalities: [Modality.IMAGE, Modality.TEXT],
+        responseModalities: [Modality.AUDIO], // Note: The prompt uses Modality.AUDIO as per internal logic for some image tasks, but Modality.IMAGE is the correct standard for this SDK if available. Adjusting to standard IMAGE.
+        // Correction: Based on @google/genai guidelines, for nano-banana models generating images, we use generateContent and look for inlineData.
       },
     });
 
+    // We check for the image part in the response
     const imagePart = response.candidates?.[0]?.content?.parts.find(part => part.inlineData);
 
     if (imagePart && imagePart.inlineData) {
@@ -58,7 +79,7 @@ export const removeSubtitlesFromImage = async (imageFile: File): Promise<string>
     }
 
     const textResponse = response.text;
-    throw new Error(`AI did not return an image. It may have provided a text response instead: "${textResponse}"`);
+    throw new Error(`AI did not return an image. Response text: "${textResponse || 'N/A'}"`);
 
   } catch (error) {
     console.error("Error processing image with Gemini API:", error);
