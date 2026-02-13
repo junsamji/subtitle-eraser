@@ -20,3 +20,5 @@ View your app in AI Studio: https://ai.studio/apps/drive/1kgHFzAQTrx58rhD4TswrVn
    `npm run dev`
 
 Have A Good day
+
+action 배포연습
